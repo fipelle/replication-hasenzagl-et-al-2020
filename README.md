@@ -6,4 +6,5 @@ Hasenzagl, T., Pellegrino, F., Reichlin, L., & Ricco, G. (2020). A Model of the 
 ## Code structure
 The main directory is organized as follows:
 
-* Metropolis-Within-Gibbs: contains the code for Metropolis-Within-Gibbs algorithm
+* *code_main* contains all of the julia code necessary for replication
+* *Metropolis-Within-Gibbs* contains the code for Metropolis-Within-Gibbs algorithm
