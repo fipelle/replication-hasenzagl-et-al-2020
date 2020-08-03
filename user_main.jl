@@ -3,8 +3,8 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 using Distributed;
-include("read_data.jl");
-include("./tc_mwg.jl");
+include("code_main/read_data.jl");
+include("code_main/tc_mwg.jl");
 @everywhere include("./Metropolis-Within-Gibbs/MetropolisWithinGibbs.jl")
 @everywhere using DataFrames, Dates, FileIO, BSON, LinearAlgebra, Random, Statistics, XLSX;
 @everywhere using Main.MetropolisWithinGibbs;
@@ -17,12 +17,10 @@ h = 8; # forecast horizon [it is used when run_type is 1 or 3]
 # ----------------------------------------------------------------------------------------------------------------------
 # Metropolis-Within-Gibbs settings
 # ----------------------------------------------------------------------------------------------------------------------
-# You can use two different settings for the initialisation and the execution
-# ----------------------------------------------------------------------------------------------------------------------
 
-nDraws    = [60000; 40000];
-burnin    = nDraws .- 20000;
-mwg_const = [0.025; 0.25];
+nDraws    = [60000; 40000]; # [number of draws in initialization; number of draws in execusion]
+burnin    = nDraws .- 20000; # number of draws in the burn-in stage 
+mwg_const = [0.025; 0.25]; # Initial constant. mwg_const might be adjusted to get an acceptance rate between 25% and 35%
 
 #=
 ------------------------------------------------------------------------------------------------------------------------
@@ -39,9 +37,9 @@ run_type = 1;
 
 if run_type == 1
 	res_name = "iis"
-else if run_type == 2
+elseif run_type == 2
 	res_name = "cond"
-else if run_type == 3
+elseif run_type == 3
 	res_name = "oos"
 end
 
@@ -70,4 +68,4 @@ data, date, nM, nQ, MNEMONIC = read_data(data_path);
 Random.seed!(2);
 
 # Run code
-include("tc_main.jl");
+include("code_main/tc_main.jl");
