@@ -10,7 +10,7 @@ include("./tc_mwg.jl");
 @everywhere using Main.MetropolisWithinGibbs;
 
 data_path = "./data/inflation.xlsx"; # Data file
-end_presample_vec = [30, 9, 2007]; # End presample, day/month/year [it is used when run_type is 2 or 3]
+end_presample_vec = [31, 12, 1998]; # End presample, day/month/year [it is used when run_type is 2 or 3]
 h = 8; # forecast horizon [it is used when run_type is 1 or 3]
 
 
@@ -37,8 +37,13 @@ Run type
 # In-sample run
 run_type = 1;
 
-# when run_type == 2 it is the final part of the name for the iis output
-res_name = "full"
+if run_type == 1
+	res_name = "iis"
+else if run_type == 2
+	res_name = "cond"
+else if run_type == 3
+	res_name = "oos"
+end
 
 #=
 The variable `cond` is used only when run_type == 2.
