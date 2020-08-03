@@ -19,15 +19,15 @@ The main directory is organized as follows:
 
 The code was written and run in Julia 1.0: https://julialang.org/
 
+The code uses a number of Julia packages. All necessary packages can be installed using the `import_packages.jl` script. To do so, start julia and use the following command at the julia REPL prompt: `julia> include("import_packages.jl")`
+
 The main file is `user_main.jl`. This script runs the
 
 * in-sample estimation, by setting `run_type=1` in `user_main.jl`.
 * conditional forecasting exercise, by setting `run_type=2` in `user_main.jl` and specifying the start date of the forecasting exercise, and the conditioning variables and time periods. 
 * out-of-sample forecasting exercise, by setting `run_type=3` and specifying the start date of the forecasting exercise.
 
-To run the script start julia and use the following command at the julia REPL prompt: 
-
-``julia> include("user_main.jl")``
+To run the script start julia and use the following command at the julia REPL prompt: ``julia> include("user_main.jl")``
 
 ## Figures and Tables
 
