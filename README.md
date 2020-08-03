@@ -6,5 +6,6 @@ Hasenzagl, T., Pellegrino, F., Reichlin, L., & Ricco, G. (2020). A Model of the 
 ## Code structure
 The main directory is organized as follows:
 
-* *code_main* contains all of the julia code necessary for replication
-* *Metropolis-Within-Gibbs* contains the code for Metropolis-Within-Gibbs algorithm
+* *code_main*: Contains all of the julia code necessary for replication
+** *Metropolis-Within-Gibbs*: Contains the code for the Metropolis-Within-Gibbs algorithm
+* *data*: Contains the data used in the estimation. The data is saved in ".csv" and ".xlsx" files. 
