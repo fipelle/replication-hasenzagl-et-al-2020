@@ -22,9 +22,11 @@ The main file is `user_main.jl`. This script runs the
 * conditional forecasting exercise, by setting `run_type=2` in `user_main.jl` and specifying the start date of the forecasting exercise, and the conditioning variables and time periods. 
 * out-of-sample forecasting exercise, by setting `run_type=3` and specifying the start date of the forecasting exercise.
 
-To run the script start julia and use the following command at the julia REPL prompt:
-
-`julia> include("user_main.jl")`
+To run the script start julia and use the following command at the julia REPL prompt: `julia> include("user_main.jl")`
 
 ## Figures and Tables
 
+The figures and tables are created in two Jupyter (https://jupyter.org/) notebooks:
+
+* `iis_charts.ipynb`: creates all figures relating to the in-sample estimation
+* `oos_charts.ipynb`: creates all figures relating to the out-of-sample forecasting exercise and the RMSE of the trend-cycle model relative to the RMSE of a random walk with drift. 
