@@ -3,9 +3,9 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 using Distributed;
-include("code_main/read_data.jl");
-include("code_main/tc_mwg.jl");
-@everywhere include("./Metropolis-Within-Gibbs/MetropolisWithinGibbs.jl")
+include("code/read_data.jl");
+include("code/tc_mwg.jl");
+@everywhere include("code/Metropolis-Within-Gibbs/MetropolisWithinGibbs.jl")
 @everywhere using DataFrames, Dates, FileIO, BSON, LinearAlgebra, Random, Statistics, XLSX;
 @everywhere using Main.MetropolisWithinGibbs;
 
@@ -68,4 +68,4 @@ data, date, nM, nQ, MNEMONIC = read_data(data_path);
 Random.seed!(2);
 
 # Run code
-include("code_main/tc_main.jl");
+include("code/tc_main.jl");
