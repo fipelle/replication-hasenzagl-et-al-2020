@@ -11,8 +11,8 @@ The main directory is organized as follows:
 
 * *code_main*: Contains all of the julia code necessary for replication.
     + The *Metropolis-Within-Gibbs* subdirectory contains the code for the Metropolis-Within-Gibbs algorithm.
-* *data*: Contains the data used in the estimation. The data is saved in ".csv" and ".xlsx" files. 
-* *csv_output*: Contains the generated csv output files.   
+* *data*: Contains the data used in the estimation. The data is saved in .csv and .xlsx files. 
+* *csv_output*: Contains the generated .csv output files.   
 * *img*: Contains the generated figures.
 
 The code was written and run in Julia 1.0 (https://julialang.org/).
