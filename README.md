@@ -17,7 +17,7 @@ The main directory is organized as follows:
 
 ## Running the code
 
-The code was written and run in Julia 1.0: https://julialang.org/
+The code was written and run in Julia 1.0 (https://julialang.org/)
 
 The code uses a number of Julia packages. All necessary packages can be installed using the `import_packages.jl` script. To do so, start julia and use the following command at the julia REPL prompt: 
 `julia> include("import_packages.jl")`
