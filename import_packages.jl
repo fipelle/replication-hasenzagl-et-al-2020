@@ -4,7 +4,7 @@ import Pkg;
 Pkg.add("DataFrames")
 Pkg.add("Distributions")
 Pkg.add("FileIO")
-Pkg.add("BSON")
+Pkg.add("JLD")
 Pkg.add("XLSX")
 
 # Packages used to make the charts

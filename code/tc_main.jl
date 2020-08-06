@@ -31,8 +31,8 @@ if run_type == 1
     distr_α, distr_fcst, chain_θ_unb, chain_θ_bound, mwg_const, acc_rate, par, par_ind, par_size, distr_par =
          tc_mwg(data, h, nDraws, burnin, mwg_const, σʸ);
 
-    # Save res in bson format
-    save(string("./res_", res_name, ".bson"), Dict("distr_α" => distr_α, "distr_fcst" => distr_fcst, "chain_θ_unb" => chain_θ_unb,
+    # Save res in jld format
+    save(string("./res_", res_name, ".jld"), Dict("distr_α" => distr_α, "distr_fcst" => distr_fcst, "chain_θ_unb" => chain_θ_unb,
                 "chain_θ_bound" => chain_θ_bound, "mwg_const" => mwg_const, "acc_rate" => acc_rate, "par" => par,
                 "nDraws" => nDraws, "burnin" => burnin, "data" => data, "date" => date, "nM" => nM, "nQ" => nQ,
                 "MNEMONIC" => MNEMONIC, "par_ind" => par_ind, "par_size" => par_size, "distr_par" => distr_par, "σʸ" => σʸ));
@@ -47,8 +47,8 @@ elseif run_type == 2
 
     # ----- Load in-sample output -----
 
-    # Load bson output
-    res_iis = load(string("./res_", res_name, ".bson"));
+    # Load jld output
+    res_iis = load(string("./res_", res_name, ".jld"));
 
     # Minimum output to compute the conditional forecasts
     data      = res_iis["data"];
@@ -104,8 +104,8 @@ elseif run_type == 2
 
         print("\n");
 
-        # Save res in bson format
-        save(string("./res_", res_name, "_cond$(i).bson"), Dict("data_ith" => data_ith, "distr_fcst_cond" => distr_fcst_cond,
+        # Save res in jld format
+        save(string("./res_", res_name, "_cond$(i).jld"), Dict("data_ith" => data_ith, "distr_fcst_cond" => distr_fcst_cond,
                                                                 "distr_α_cond" => distr_α_cond, "conditional_path" => cond[i]));
     end
 
@@ -170,8 +170,8 @@ elseif run_type == 3
         σ_array[t-end_presample+1]      = σʸ;
     end
 
-    # Save res in bson format
-    save(string("./res_", res_name, ".bson"), Dict("distr_α" => distr_α, "distr_fcst" => distr_fcst, "chain_θ_unb" => chain_θ_unb,
+    # Save res in jld format
+    save(string("./res_", res_name, ".jld"), Dict("distr_α" => distr_α, "distr_fcst" => distr_fcst, "chain_θ_unb" => chain_θ_unb,
                 "chain_θ_bound" => chain_θ_bound, "mwg_const" => mwg_const, "acc_rate" => acc_rate, "par" => par,
                 "nDraws" => nDraws, "burnin" => burnin, "data" => data, "date" => date, "nM" => nM, "nQ" => nQ,
                 "MNEMONIC" => MNEMONIC, "par_ind" => par_ind, "par_size" => par_size, "distr_par" => distr_par,
