@@ -27,7 +27,7 @@ The code uses a number of Julia packages. All necessary packages can be installe
 The main file is `user_main.jl`. This script runs the following exercises:
 
 * The in-sample estimation is run by setting `run_type=1` in `user_main.jl`.
-* The conditional forecasting exercise is run by setting `run_type=2` and specifying the start date of the forecasting exercise, and the conditioning variables and time periods. The paper does not include a conditional forecasting exercise. 
+* The conditional forecasting exercise is run by setting `run_type=2` and specifying the start date of the forecasting exercise, and the conditioning variables and time periods. Note that the paper does not include a conditional forecasting exercise. 
 * The out-of-sample forecasting exercise is run by setting `run_type=3` and specifying the start date of the forecasting exercise.
 
 After choosing the `run_type` run the script by starting julia and using the following command at the julia REPL prompt: 
