@@ -157,7 +157,6 @@ elseif run_type == 3
 
         # Run the Metropolis-Within-Gibbs
         global mwg_const;
-        println(mwg_const)
         distr_α, distr_fcst, chain_θ_unb, chain_θ_bound, mwg_const, acc_rate, par, par_ind, par_size, distr_par =
              tc_mwg(data, h, nDraws, burnin, mwg_const, σʸ);
 
