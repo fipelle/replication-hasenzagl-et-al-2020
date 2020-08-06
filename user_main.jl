@@ -19,7 +19,7 @@ h = 8; # forecast horizon [it is used when run_type is 1 or 3]
 # ----------------------------------------------------------------------------------------------------------------------
 
 nDraws    = [60000; 40000]; # [number of draws in initialization; number of draws in execusion]
-burnin    = nDraws .- 20000; # number of draws in the burn-in stage 
+burnin    = nDraws .- 20000; # number of draws in the burn-in stage
 mwg_const = [0.025; 0.25]; # Initial constant. mwg_const might be adjusted to get an acceptance rate between 25% and 35%
 
 #=
@@ -32,8 +32,8 @@ Run type
 ------------------------------------------------------------------------------------------------------------------------
 =#
 
-# In-sample run
-run_type = 1;
+# Out-of-sample run
+run_type = 3;
 
 if run_type == 1
 	res_name = "iis"
@@ -42,6 +42,9 @@ elseif run_type == 2
 elseif run_type == 3
 	res_name = "oos"
 end
+
+# Name for the in-sample results (used only in the conditional forecast mode)
+res_name_iis = "iis";
 
 #=
 The variable `cond` is used only when run_type == 2.

@@ -48,7 +48,7 @@ elseif run_type == 2
     # ----- Load in-sample output -----
 
     # Load jld output
-    res_iis = load(string("./res_", res_name, ".jld"));
+    res_iis = load(string("./res_", res_name_iis, ".jld"));
 
     # Minimum output to compute the conditional forecasts
     data      = res_iis["data"];
@@ -123,16 +123,16 @@ elseif run_type == 3
 
     # end_presample_vec
     date_vec      = vcat([[Dates.day(date[i]) Dates.month(date[i]) Dates.year(date[i])] for i=1:length(date)]...);
-    end_presample = findall(sum(date_vec .== end_presample_vec', 2) .== 3)[1];
+    end_presample = findall(sum(date_vec .== end_presample_vec', dims=2)[:] .== 3)[1];
     end_oos       = size(date_vec)[1];
 
     if end_presample == end_oos
         error("end_presample_vec is not set correctly");
     end
 
-    oos_forecast = Array{Any}(end_oos-end_presample+1);
-    α_array      = Array{Any}(end_oos-end_presample+1);
-    σ_array      = Array{Any}(end_oos-end_presample+1);
+    oos_forecast = Array{Any}(undef, end_oos-end_presample+1);
+    α_array      = Array{Any}(undef, end_oos-end_presample+1);
+    σ_array      = Array{Any}(undef, end_oos-end_presample+1);
 
     # ----- Run the out-of-sample -----
 
@@ -143,21 +143,23 @@ elseif run_type == 3
 
         # Mixed-frequency
         if nM > 0 && nQ > 0
-            σʸ_monthly   = hcat([std(dropna(diff(data[:, i])), 1) for i=1:nM]...);
-            σʸ_quarterly = hcat([std(dropna(diff(data[3:3:end, i])), 1) for i=nM+1:nM+nQ]...);
+            σʸ_monthly   = hcat([std(collect(skipmissing(diff(data[:, i]))), dims=1) for i=1:nM]...);
+            σʸ_quarterly = hcat([std(collect(skipmissing(diff(data[3:3:end, i]))), dims=1) for i=nM+1:nM+nQ]...);
             σʸ           = [σʸ_monthly σʸ_quarterly];
 
         # Mono frequency
         else
-            σʸ = hcat([std(dropna(diff(data[:, i])), 1) for i=1:nM+nQ]...);
+            σʸ = hcat([std(collect(skipmissing(diff(data[:, i]))), dims=1) for i=1:nM+nQ]...);
         end
 
         data = data ./ σʸ;
-        data = [data; NA*ones(h, nM+nQ)];
+        data = [data; missing .* ones(h, nM+nQ)];
 
         # Run the Metropolis-Within-Gibbs
+        global mwg_const;
+        println(mwg_const)
         distr_α, distr_fcst, chain_θ_unb, chain_θ_bound, mwg_const, acc_rate, par, par_ind, par_size, distr_par =
-            tc_mwg(data, h, nDraws, burnin, mwg_const, σʸ);
+             tc_mwg(data, h, nDraws, burnin, mwg_const, σʸ);
 
         # Re-attribute standard deviation of the delta to the forecasts
         for draw=1:nDraws[2]-burnin[2]
