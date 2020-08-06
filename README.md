@@ -14,7 +14,7 @@ The main directory is organized as follows:
 * *data*: Contains the data used in the estimation. The data is saved in .csv and .xlsx files. 
 * *csv_output*: Contains the generated .csv output files.   
 * *img*: Contains the generated figures.
-* *annex_global_data*: Contains a directory with the data files, `tc_mwg.jl`, and `iis_charts.ipynb` for the model with global variables. To estimate this model use those files instead of the files with the same names in the *data* and *code* directories. 
+* *annex_global_data*: Contains a directory with the data files, `tc_mwg.jl`, and `iis_charts.ipynb` for the model with global variables. To estimate this model use these files instead of the files with the same names in the *data* and *code* directories. 
 
 The code was written and run in Julia 1.0 (https://julialang.org/).
 
