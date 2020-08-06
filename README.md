@@ -30,7 +30,7 @@ The main file is `user_main.jl`. This script runs the following exercises:
 * Conditional forecasting exercise, by setting `run_type=2` and specifying the start date of the forecasting exercise, and the conditioning variables and time periods 
 * Out-of-sample forecasting exercise, by setting `run_type=3` and specifying the start date of the forecasting exercise.
 
-To run the script start julia and use the following command at the julia REPL prompt: 
+After choosing the `run_type` run the script by starting julia and using the following command at the julia REPL prompt: 
 
 `julia> include("user_main.jl")`
 
