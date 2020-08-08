@@ -1,3 +1,8 @@
+#=
+This file is part of the replication code for: Hasenzagl, T., Pellegrino, F., Reichlin, L., & Ricco, G. (2020). A Model of the Fed's View on Inflation.
+Please cite the paper if you are using any part of the code for academic work (including, but not limited to, conference and peer-reviewed papers).
+=#
+
 function mwg_run(θ_unb::Array{Float64,1}, par::ParSsm, h::Int64, par_ind::BoolParSsm, par_size::SizeParSsm,
                   prior_opt::PriorOpt, MIN::Array{Float64, 1}, MAX::Array{Float64, 1}, opt_transf::Array{Int64, 1},
                   nDraws::Int64, burnin::Int64, mwg_const::Float64, algorithm_name::String, t::Int64, end_oos::Int64,

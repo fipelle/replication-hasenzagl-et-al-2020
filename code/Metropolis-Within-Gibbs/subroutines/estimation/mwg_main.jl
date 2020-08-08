@@ -1,5 +1,11 @@
+#=
+This file is part of the replication code for: Hasenzagl, T., Pellegrino, F., Reichlin, L., & Ricco, G. (2020). A Model of the Fed's View on Inflation.
+Please cite the paper if you are using any part of the code for academic work (including, but not limited to, conference and peer-reviewed papers).
+=#
+
 function mwg_main(par::ParSsm, h::Int64, nDraws::Array{Int64, 1}, burnin::Array{Int64, 1},
                   mwg_const::Array{Float64, 1}, par_ind::BoolParSsm, t=0::Int64, end_oos=0::Int64)
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Metropolis-Within-Gibbs algorithm: mainframe
 # ----------------------------------------------------------------------------------------------------------------------

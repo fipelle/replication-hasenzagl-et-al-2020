@@ -1,4 +1,10 @@
+#=
+This file is part of the replication code for: Hasenzagl, T., Pellegrino, F., Reichlin, L., & Ricco, G. (2020). A Model of the Fed's View on Inflation.
+Please cite the paper if you are using any part of the code for academic work (including, but not limited to, conference and peer-reviewed papers).
+=#
+
 function kalman_diffuse!(par::ParSsm, do_loglik=0::Int64, do_smoother=0::Int64, do_sim_smoother=0::Int64, F_tol=1e-8::Float64)
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Diffuse Kalman Filter, Smoother and Simulation Smoother (univariate approach for multivariate models).
 # The function update the loglikelihood in par if do_loglik is 1.
