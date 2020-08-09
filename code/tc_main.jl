@@ -135,9 +135,7 @@ elseif run_type == 3
         error("end_presample_vec is not set correctly");
     end
 
-    oos_forecast = Array{Any}(undef, end_oos-end_presample+1);
-    α_array      = Array{Any}(undef, end_oos-end_presample+1);
-    σ_array      = Array{Any}(undef, end_oos-end_presample+1);
+    oos_length = end_oos-end_presample+1;
 
     # ----- Run the out-of-sample -----
 
@@ -170,16 +168,14 @@ elseif run_type == 3
             distr_fcst[:, :, draw] = distr_fcst[:, :, draw] .* σʸ;
         end
 
-        # Store results
-        oos_forecast[t-end_presample+1] = distr_fcst;
-        α_array[t-end_presample+1]      = distr_α;
-        σ_array[t-end_presample+1]      = σʸ;
+        # Save res for time t in jld format
+        save(string("./res_", res_name, "_chunk", t, ".jld"), Dict("distr_α" => distr_α, "distr_fcst" => distr_fcst,
+                    "chain_θ_unb" => chain_θ_unb, "chain_θ_bound" => chain_θ_bound, "mwg_const" => mwg_const,
+                    "acc_rate" => acc_rate, "par" => par, "par_ind" => par_ind, "par_size" => par_size,
+                    "distr_par" => distr_par, "data" => data));
     end
 
     # Save res in jld format
-    save(string("./res_", res_name, ".jld"), Dict("distr_α" => distr_α, "distr_fcst" => distr_fcst, "chain_θ_unb" => chain_θ_unb,
-                "chain_θ_bound" => chain_θ_bound, "mwg_const" => mwg_const, "acc_rate" => acc_rate, "par" => par,
-                "nDraws" => nDraws, "burnin" => burnin, "data" => data, "date" => date, "nM" => nM, "nQ" => nQ,
-                "MNEMONIC" => MNEMONIC, "par_ind" => par_ind, "par_size" => par_size, "distr_par" => distr_par,
-                "oos_forecast" => oos_forecast, "α_array" => α_array, "σ_array" => σ_array, "data_full" => data_full));
+    save(string("./res_", res_name, "_chunk0.jld"), Dict("nDraws" => nDraws, "burnin" => burnin, "date" => date,
+                "nM" => nM, "nQ" => nQ, "MNEMONIC" => MNEMONIC, "data_full" => data_full));
 end
