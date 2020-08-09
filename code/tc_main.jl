@@ -176,6 +176,6 @@ elseif run_type == 3
     end
 
     # Save res in jld format
-    save(string("./res_", res_name, "_chunk0.jld"), Dict("nDraws" => nDraws, "burnin" => burnin, "date" => date,
+    save(string("./res_", res_name, "_chunk0.jld"), Dict("oos_length" => oos_length, "nDraws" => nDraws, "burnin" => burnin, "date" => date,
                 "nM" => nM, "nQ" => nQ, "MNEMONIC" => MNEMONIC, "data_full" => data_full));
 end
