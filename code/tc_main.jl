@@ -172,7 +172,7 @@ elseif run_type == 3
         save(string("./res_", res_name, "_chunk", t-end_presample+1, ".jld"), Dict("distr_α" => distr_α, "distr_fcst" => distr_fcst,
                     "chain_θ_unb" => chain_θ_unb, "chain_θ_bound" => chain_θ_bound, "mwg_const" => mwg_const,
                     "acc_rate" => acc_rate, "par" => par, "par_ind" => par_ind, "par_size" => par_size,
-                    "distr_par" => distr_par, "data" => data));
+                    "distr_par" => distr_par, "data" => data, "σʸ" => σʸ));
     end
 
     # Save res in jld format
