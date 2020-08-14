@@ -9,14 +9,15 @@ If you have any questions, comments, or suggestions please create a new issue or
 ## Code structure
 The main directory is organized as follows:
 
+* *annex_global_data*: Contains a directory with the data files, `tc_mwg.jl`, and `iis_charts.ipynb` for the model with global variables. To estimate this model use these files instead of the files with the same names in the *data* and *code* directories.
 * *code_main*: Contains all of the Julia code necessary for replication.
     + The *Metropolis-Within-Gibbs* subdirectory contains the code for the Metropolis-Within-Gibbs algorithm.
+* *csv_output*: Used for storing the .csv output files.   
 * *data*: Contains the data used in the estimation. The data is saved in .csv and .xlsx files.
-* *csv_output*: Contains the generated .csv output files.   
-* *img*: Contains the generated figures.
-* *annex_global_data*: Contains a directory with the data files, `tc_mwg.jl`, and `iis_charts.ipynb` for the model with global variables. To estimate this model use these files instead of the files with the same names in the *data* and *code* directories.
+* *docs*: Contains the paper and online appendix.
+* *img*: Used for storing the output figures.
 
-The code was written and run in Julia 1.0.5 (https://julialang.org/).
+The code is written in Julia 1.0.5 (https://julialang.org/).
 
 The code uses a number of Julia packages. All necessary packages can be installed using the `import_packages.jl` script. To do so, start Julia and use the following command at the Julia REPL prompt:
 
