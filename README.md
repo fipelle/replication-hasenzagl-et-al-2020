@@ -9,7 +9,7 @@ If you have any questions, comments, or suggestions please create a new issue or
 ## Code structure
 The main directory is organized as follows:
 
-* *annex_global_data*: Contains a directory with the data files, `tc_mwg.jl`, and `iis_charts.ipynb` for the model with global variables. To estimate this model use these files instead of the files with the same names in the *data* and *code* directories. The dataset for the global model includes the Baltic Dry Index(BDI) which is available here: https://www.balticexchange.com/en/index.html. 
+* *annex_global_data*: Contains a directory with the data files, `tc_mwg.jl`, and `iis_charts.ipynb` for the model with global variables. To estimate this model use these files instead of the files with the same names in the *data* and *code* directories. The dataset for the global model includes the Baltic Dry Index (BDI) which is available here: https://www.balticexchange.com/en/index.html. 
 * *code_main*: Contains all of the Julia code necessary for replication.
     + The *Metropolis-Within-Gibbs* subdirectory contains the code for the Metropolis-Within-Gibbs algorithm.
 * *csv_output*: Used for storing the .csv output files.   
