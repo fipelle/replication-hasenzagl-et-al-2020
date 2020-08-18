@@ -3,7 +3,7 @@ This file is part of the replication code for: Hasenzagl, T., Pellegrino, F., Re
 Please cite the paper if you are using any part of the code for academic work (including, but not limited to, conference and peer-reviewed papers).
 =#
 
-function monthly2quarterly(a,n)
+function quarterly2monthly(a,n)
 
     #=
     Filename: monthly2quarterly.jl

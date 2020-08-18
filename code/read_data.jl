@@ -3,7 +3,7 @@ This file is part of the replication code for: Hasenzagl, T., Pellegrino, F., Re
 Please cite the paper if you are using any part of the code for academic work (including, but not limited to, conference and peer-reviewed papers).
 =#
 
-include("./monthly2quarterly.jl");
+include("./quarterly2monthly.jl");
 
 function read_data(data_path)
 
@@ -54,7 +54,7 @@ function read_data(data_path)
           print("There is no data in $data_path \n");
 
      else
-          Xq   = monthly2quarterly(data_quarterly, size(data_monthly)[1]);
+          Xq   = quarterly2monthly(data_quarterly, size(data_monthly)[1]);
           date = date_monthly;
           data = [[data_monthly; missing.*ones(size(Xq,1)-size(data_monthly,1), size(data_monthly,2))] Xq];
           nM   = size(data_monthly)[2];
