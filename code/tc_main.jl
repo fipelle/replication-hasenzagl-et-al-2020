@@ -8,6 +8,18 @@ Name: tc_main.jl
 Description: Execution manager
 =#
 
+
+#=
+--------------------------------------------------------------------------------------------------
+Dependencies
+--------------------------------------------------------------------------------------------------
+=#
+
+"""
+    standardise_data!(data::Matrix{Union{Float64, Missing}}, nM::Int64, nQ::Int64)
+
+Standardise data.
+"""
 function standardise_data!(data::Matrix{Union{Float64, Missing}}, nM::Int64, nQ::Int64)
     
     # Mixed-frequency
@@ -28,13 +40,12 @@ function standardise_data!(data::Matrix{Union{Float64, Missing}}, nM::Int64, nQ:
    return σʸ;
 end
 
+"""
+    tc_iis_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64})
 
-# ----------------------------------------------------------------------------------------------------------------------
-# Execution: run_type == 1
-# - Single iteration: it executes the code using the most updated datapoints
-# ----------------------------------------------------------------------------------------------------------------------
-
-if run_type == 1
+Single iteration: it executes the code using the most updated datapoints.
+"""
+function tc_iis_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64})
 
     # ----- Prepare the data -----
 
@@ -51,14 +62,14 @@ if run_type == 1
                 "chain_θ_bound" => chain_θ_bound, "mwg_const" => mwg_const, "acc_rate" => acc_rate, "par" => par,
                 "nDraws" => nDraws, "burnin" => burnin, "data" => data, "date" => date, "nM" => nM, "nQ" => nQ,
                 "MNEMONIC" => MNEMONIC, "par_ind" => par_ind, "par_size" => par_size, "distr_par" => distr_par, "σʸ" => σʸ));
+end
 
+"""
+    tc_cond_fc_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64}, cond::Vector{Any})
 
-# ----------------------------------------------------------------------------------------------------------------------
-# Execution: run_type == 2
-# - Conditional forecasts
-# ----------------------------------------------------------------------------------------------------------------------
-
-elseif run_type == 2
+Conditional forecasts.
+"""
+function tc_cond_fc_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64}, cond::Vector{Any})
 
     # ----- Load in-sample output -----
 
@@ -121,15 +132,26 @@ elseif run_type == 2
 
         # Save res in jld format
         save(string("./res_", res_name, "_cond$(i).jld"), Dict("data_ith" => data_ith, "distr_fcst_cond" => distr_fcst_cond,
-                                                                "distr_α_cond" => distr_α_cond, "conditional_path" => cond[i]));
+                    "distr_α_cond" => distr_α_cond, "conditional_path" => cond[i]));
     end
+end
 
 
-# ----------------------------------------------------------------------------------------------------------------------
-# Execution: run_type == 3
-# -  Out-of-sample: out-of-sample exercise, forecasting period starts after end_presample_vec
-# ----------------------------------------------------------------------------------------------------------------------
+#=
+--------------------------------------------------------------------------------------------------
+Execution manager
+--------------------------------------------------------------------------------------------------
+=#
 
+# Single iteration: it executes the code using the most updated datapoints
+if run_type == 1
+    tc_iis_run(data, date, nM, nQ, MNEMONIC, h, nDraws, burnin, mwg_const);
+
+# Conditional forecasts
+elseif run_type == 2
+    tc_cond_fc_run(data, date, nM, nQ, MNEMONIC, h, nDraws, burnin, mwg_const, cond);
+
+# Out-of-sample: out-of-sample exercise, forecasting period starts after end_presample_vec
 elseif run_type == 3
 
     # ----- Initialise -----
