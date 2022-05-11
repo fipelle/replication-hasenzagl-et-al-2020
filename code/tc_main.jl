@@ -8,6 +8,27 @@ Name: tc_main.jl
 Description: Execution manager
 =#
 
+function standardise_data!(data::Matrix{Union{Float64, Missing}}, nM::Int64, nQ::Int64)
+    
+    # Mixed-frequency
+    if nM > 0 && nQ > 0
+        σʸ_monthly   = hcat([std(collect(skipmissing(diff(data[:, i]))), dims=1) for i=1:nM]...);
+        σʸ_quarterly = hcat([std(collect(skipmissing(diff(data[3:3:end, i]))), dims=1) for i=nM+1:nM+nQ]...);
+        σʸ           = [σʸ_monthly σʸ_quarterly];
+
+   # Mono frequency
+   else
+        σʸ = hcat([std(collect(skipmissing(diff(data[:, i]))), dims=1) for i=1:nM+nQ]...);
+   end
+
+   # Standardize the data
+   data ./= σʸ;
+
+   # Return standardisation factor
+   return σʸ;
+end
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Execution: run_type == 1
 # - Single iteration: it executes the code using the most updated datapoints
@@ -15,20 +36,9 @@ Description: Execution manager
 
 if run_type == 1
 
-    # ----- Standardize the data -----
+    # ----- Prepare the data -----
 
-    # Mixed-frequency
-    if nM > 0 && nQ > 0
-         σʸ_monthly   = hcat([std(collect(skipmissing(diff(data[:, i]))), dims=1) for i=1:nM]...);
-         σʸ_quarterly = hcat([std(collect(skipmissing(diff(data[3:3:end, i]))), dims=1) for i=nM+1:nM+nQ]...);
-         σʸ           = [σʸ_monthly σʸ_quarterly];
-
-    # Mono frequency
-    else
-         σʸ = hcat([std(collect(skipmissing(diff(data[:, i]))), dims=1) for i=1:nM+nQ]...);
-    end
-
-    data = data ./ σʸ; # Standardize the data
+    σʸ = standardise_data!(data, nM, nQ);
     data = [data; missing.*ones(h, nM+nQ)]; # add "missings" for forecast
 
     # ----- Run the Metropolis-Within-Gibbs -----
@@ -141,27 +151,15 @@ elseif run_type == 3
 
     for t=end_presample:end_oos
 
-        # data and data_cond
-        data = data_full[1:t, :];
-
-        # Mixed-frequency
-        if nM > 0 && nQ > 0
-            σʸ_monthly   = hcat([std(collect(skipmissing(diff(data[:, i]))), dims=1) for i=1:nM]...);
-            σʸ_quarterly = hcat([std(collect(skipmissing(diff(data[3:3:end, i]))), dims=1) for i=nM+1:nM+nQ]...);
-            σʸ           = [σʸ_monthly σʸ_quarterly];
-
-        # Mono frequency
-        else
-            σʸ = hcat([std(collect(skipmissing(diff(data[:, i]))), dims=1) for i=1:nM+nQ]...);
-        end
-
-        data = data ./ σʸ;
-        data = [data; missing .* ones(h, nM+nQ)];
-
+        # Prepare the data
+        data_t = data_full[1:t, :];
+        σʸ = standardise_data!(data_t, nM, nQ);
+        data_t = [data_t; missing.*ones(h, nM+nQ)]; # add "missings" for forecast
+    
         # Run the Metropolis-Within-Gibbs
         global mwg_const;
         distr_α, distr_fcst, chain_θ_unb, chain_θ_bound, mwg_const, acc_rate, par, par_ind, par_size, distr_par =
-             tc_mwg(data, h, nDraws, burnin, mwg_const, σʸ);
+             tc_mwg(data_t, h, nDraws, burnin, mwg_const, σʸ);
 
         # Re-attribute standard deviation of the delta to the forecasts
         for draw=1:nDraws[2]-burnin[2]
@@ -172,7 +170,7 @@ elseif run_type == 3
         save(string("./res_", res_name, "_chunk", t-end_presample+1, ".jld"), Dict("distr_α" => distr_α, "distr_fcst" => distr_fcst,
                     "chain_θ_unb" => chain_θ_unb, "chain_θ_bound" => chain_θ_bound, "mwg_const" => mwg_const,
                     "acc_rate" => acc_rate, "par" => par, "par_ind" => par_ind, "par_size" => par_size,
-                    "distr_par" => distr_par, "data" => data, "σʸ" => σʸ));
+                    "distr_par" => distr_par, "data" => data_t, "σʸ" => σʸ));
     end
 
     # Save res in jld format
