@@ -41,11 +41,11 @@ function standardise_data!(data::Matrix{Union{Float64, Missing}}, nM::Int64, nQ:
 end
 
 """
-    tc_iis_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64})
+    tc_iis_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64}, res_name::String)
 
 Single iteration: it executes the code using the most updated datapoints.
 """
-function tc_iis_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64})
+function tc_iis_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64}, res_name::String)
 
     # ----- Prepare the data -----
 
@@ -65,11 +65,11 @@ function tc_iis_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, n
 end
 
 """
-    tc_cond_fc_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64}, cond::Vector{Any})
+    tc_cond_fc_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64}, res_name::String, cond::Vector{Any}, res_name_iis:String)
 
 Conditional forecasts.
 """
-function tc_cond_fc_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64}, cond::Vector{Any})
+function tc_cond_fc_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64}, res_name::String, cond::Vector{Any}, res_name_iis:String)
 
     # ----- Load in-sample output -----
 
@@ -136,23 +136,12 @@ function tc_cond_fc_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date
     end
 end
 
+"""
+    tc_oos_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64}, res_name::String, end_presample_vec::Vector{Int64})
 
-#=
---------------------------------------------------------------------------------------------------
-Execution manager
---------------------------------------------------------------------------------------------------
-=#
-
-# Single iteration: it executes the code using the most updated datapoints
-if run_type == 1
-    tc_iis_run(data, date, nM, nQ, MNEMONIC, h, nDraws, burnin, mwg_const);
-
-# Conditional forecasts
-elseif run_type == 2
-    tc_cond_fc_run(data, date, nM, nQ, MNEMONIC, h, nDraws, burnin, mwg_const, cond);
-
-# Out-of-sample: out-of-sample exercise, forecasting period starts after end_presample_vec
-elseif run_type == 3
+Out-of-sample: out-of-sample exercise, forecasting period starts after end_presample_vec.
+"""
+function tc_oos_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64}, res_name::String, end_presample_vec::Vector{Int64})
 
     # ----- Initialise -----
 
@@ -199,4 +188,24 @@ elseif run_type == 3
     save(string("./res_", res_name, "_chunk0.jld"), Dict("end_presample" => end_presample, "end_oos" => end_oos,
                 "oos_length" => oos_length, "nDraws" => nDraws, "burnin" => burnin, "date" => date,
                 "nM" => nM, "nQ" => nQ, "MNEMONIC" => MNEMONIC, "data_full" => data_full));
+end
+
+
+#=
+--------------------------------------------------------------------------------------------------
+Execution manager
+--------------------------------------------------------------------------------------------------
+=#
+
+# Single iteration: it executes the code using the most updated datapoints
+if run_type == 1
+    tc_iis_run(data, date, nM, nQ, MNEMONIC, h, nDraws, burnin, mwg_const, res_name);
+
+# Conditional forecasts
+elseif run_type == 2
+    tc_cond_fc_run(data, date, nM, nQ, MNEMONIC, h, nDraws, burnin, mwg_const, res_name, cond, res_name_iis);
+
+# Out-of-sample: out-of-sample exercise, forecasting period starts after end_presample_vec
+elseif run_type == 3
+    tc_oos_run(data, date, nM, nQ, MNEMONIC, h, nDraws, burnin, mwg_const, res_name, end_presample_vec);
 end
