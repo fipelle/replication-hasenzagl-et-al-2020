@@ -9,7 +9,7 @@ import Pkg;
 Pkg.add("DataFrames")
 Pkg.add("Distributions")
 Pkg.add("FileIO")
-Pkg.add("JLD")
+Pkg.add("JLD2")
 Pkg.add("XLSX")
 
 # Packages used to make the charts

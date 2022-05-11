@@ -57,24 +57,24 @@ function tc_iis_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, n
     distr_α, distr_fcst, chain_θ_unb, chain_θ_bound, mwg_const, acc_rate, par, par_ind, par_size, distr_par =
          tc_mwg(data, h, nDraws, burnin, mwg_const, σʸ);
 
-    # Save res in jld format
-    save(string("./res_", res_name, ".jld"), Dict("distr_α" => distr_α, "distr_fcst" => distr_fcst, "chain_θ_unb" => chain_θ_unb,
+    # Save res in jld2 format
+    save(string("./res_", res_name, ".jld2"), Dict("distr_α" => distr_α, "distr_fcst" => distr_fcst, "chain_θ_unb" => chain_θ_unb,
                 "chain_θ_bound" => chain_θ_bound, "mwg_const" => mwg_const, "acc_rate" => acc_rate, "par" => par,
                 "nDraws" => nDraws, "burnin" => burnin, "data" => data, "date" => date, "nM" => nM, "nQ" => nQ,
                 "MNEMONIC" => MNEMONIC, "par_ind" => par_ind, "par_size" => par_size, "distr_par" => distr_par, "σʸ" => σʸ));
 end
 
 """
-    tc_cond_fc_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64}, res_name::String, cond::Vector{Any}, res_name_iis:String)
+    tc_cond_fc_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64}, res_name::String, cond::Vector{Any}, res_name_iis::String)
 
 Conditional forecasts.
 """
-function tc_cond_fc_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64}, res_name::String, cond::Vector{Any}, res_name_iis:String)
+function tc_cond_fc_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64}, res_name::String, cond::Vector{Any}, res_name_iis::String)
 
     # ----- Load in-sample output -----
 
-    # Load jld output
-    res_iis = load(string("./res_", res_name_iis, ".jld"));
+    # Load jld2 output
+    res_iis = load(string("./res_", res_name_iis, ".jld2"));
 
     # Minimum output to compute the conditional forecasts
     data      = res_iis["data"];
@@ -130,8 +130,8 @@ function tc_cond_fc_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date
 
         print("\n");
 
-        # Save res in jld format
-        save(string("./res_", res_name, "_cond$(i).jld"), Dict("data_ith" => data_ith, "distr_fcst_cond" => distr_fcst_cond,
+        # Save res in jld2 format
+        save(string("./res_", res_name, "_cond$(i).jld2"), Dict("data_ith" => data_ith, "distr_fcst_cond" => distr_fcst_cond,
                     "distr_α_cond" => distr_α_cond, "conditional_path" => cond[i]));
     end
 end
@@ -177,15 +177,15 @@ function tc_oos_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, n
             distr_fcst[:, :, draw] = distr_fcst[:, :, draw] .* σʸ;
         end
 
-        # Save res for time t in jld format
-        save(string("./res_", res_name, "_chunk", t-end_presample+1, ".jld"), Dict("distr_α" => distr_α, "distr_fcst" => distr_fcst,
+        # Save res for time t in jld2 format
+        save(string("./res_", res_name, "_chunk", t-end_presample+1, ".jld2"), Dict("distr_α" => distr_α, "distr_fcst" => distr_fcst,
                     "chain_θ_unb" => chain_θ_unb, "chain_θ_bound" => chain_θ_bound, "mwg_const" => mwg_const,
                     "acc_rate" => acc_rate, "par" => par, "par_ind" => par_ind, "par_size" => par_size,
                     "distr_par" => distr_par, "data" => data_t, "σʸ" => σʸ));
     end
 
-    # Save res in jld format
-    save(string("./res_", res_name, "_chunk0.jld"), Dict("end_presample" => end_presample, "end_oos" => end_oos,
+    # Save res in jld2 format
+    save(string("./res_", res_name, "_chunk0.jld2"), Dict("end_presample" => end_presample, "end_oos" => end_oos,
                 "oos_length" => oos_length, "nDraws" => nDraws, "burnin" => burnin, "date" => date,
                 "nM" => nM, "nQ" => nQ, "MNEMONIC" => MNEMONIC, "data_full" => data_full));
 end
