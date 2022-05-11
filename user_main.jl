@@ -23,8 +23,8 @@ h = 8; # forecast horizon [it is used when run_type is 1 or 3]
 # Metropolis-Within-Gibbs settings
 # ----------------------------------------------------------------------------------------------------------------------
 
-nDraws    = [6000; 4000]; # [number of draws in initialization; number of draws in execusion]
-burnin    = nDraws .- 2000; # number of draws in the burn-in stage
+nDraws    = [60000; 40000]; # [number of draws in initialization; number of draws in execusion]
+burnin    = nDraws .- 20000; # number of draws in the burn-in stage
 mwg_const = [0.025; 0.25]; # Initial constant. mwg_const might be adjusted to get an acceptance rate between 25% and 35%
 
 #=
