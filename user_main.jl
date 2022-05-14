@@ -11,7 +11,7 @@ using Distributed;
 include("code/read_data.jl");
 include("code/tc_mwg.jl");
 @everywhere include("code/Metropolis-Within-Gibbs/MetropolisWithinGibbs.jl")
-@everywhere using DataFrames, Dates, FileIO, JLD, LinearAlgebra, Random, Statistics, XLSX;
+@everywhere using DataFrames, Dates, FileIO, JLD2, LinearAlgebra, Random, Statistics, XLSX;
 @everywhere using Main.MetropolisWithinGibbs;
 
 data_path = "./data/inflation.xlsx"; # Data file

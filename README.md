@@ -17,7 +17,7 @@ The main directory is organized as follows:
 * *docs*: Contains the paper and online appendix.
 * *img*: Used for storing the output figures.
 
-The code is written in Julia 1.0.5 (https://julialang.org/).
+The code is written in Julia 1.6.4 (https://julialang.org/).
 
 The code uses a number of Julia packages. All necessary packages can be installed using the `import_packages.jl` script. To do so, start Julia and use the following command at the Julia REPL prompt:
 

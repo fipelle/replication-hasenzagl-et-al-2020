@@ -8,27 +8,48 @@ Name: tc_main.jl
 Description: Execution manager
 =#
 
-# ----------------------------------------------------------------------------------------------------------------------
-# Execution: run_type == 1
-# - Single iteration: it executes the code using the most updated datapoints
-# ----------------------------------------------------------------------------------------------------------------------
 
-if run_type == 1
+#=
+--------------------------------------------------------------------------------------------------
+Dependencies
+--------------------------------------------------------------------------------------------------
+=#
 
-    # ----- Standardize the data -----
+"""
+    standardise_data!(data::Matrix{Union{Float64, Missing}}, nM::Int64, nQ::Int64)
 
+Standardise data.
+"""
+function standardise_data!(data::Matrix{Union{Float64, Missing}}, nM::Int64, nQ::Int64)
+    
     # Mixed-frequency
     if nM > 0 && nQ > 0
-         σʸ_monthly   = hcat([std(collect(skipmissing(diff(data[:, i]))), dims=1) for i=1:nM]...);
-         σʸ_quarterly = hcat([std(collect(skipmissing(diff(data[3:3:end, i]))), dims=1) for i=nM+1:nM+nQ]...);
-         σʸ           = [σʸ_monthly σʸ_quarterly];
+        σʸ_monthly   = hcat([std(collect(skipmissing(diff(data[:, i]))), dims=1) for i=1:nM]...);
+        σʸ_quarterly = hcat([std(collect(skipmissing(diff(data[3:3:end, i]))), dims=1) for i=nM+1:nM+nQ]...);
+        σʸ           = [σʸ_monthly σʸ_quarterly];
 
-    # Mono frequency
-    else
-         σʸ = hcat([std(collect(skipmissing(diff(data[:, i]))), dims=1) for i=1:nM+nQ]...);
-    end
+   # Mono frequency
+   else
+        σʸ = hcat([std(collect(skipmissing(diff(data[:, i]))), dims=1) for i=1:nM+nQ]...);
+   end
 
-    data = data ./ σʸ; # Standardize the data
+   # Standardize the data
+   data ./= σʸ;
+
+   # Return standardisation factor
+   return σʸ;
+end
+
+"""
+    tc_iis_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64}, res_name::String)
+
+Single iteration: it executes the code using the most updated datapoints.
+"""
+function tc_iis_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64}, res_name::String)
+
+    # ----- Prepare the data -----
+
+    σʸ = standardise_data!(data, nM, nQ);
     data = [data; missing.*ones(h, nM+nQ)]; # add "missings" for forecast
 
     # ----- Run the Metropolis-Within-Gibbs -----
@@ -36,24 +57,24 @@ if run_type == 1
     distr_α, distr_fcst, chain_θ_unb, chain_θ_bound, mwg_const, acc_rate, par, par_ind, par_size, distr_par =
          tc_mwg(data, h, nDraws, burnin, mwg_const, σʸ);
 
-    # Save res in jld format
-    save(string("./res_", res_name, ".jld"), Dict("distr_α" => distr_α, "distr_fcst" => distr_fcst, "chain_θ_unb" => chain_θ_unb,
+    # Save res in jld2 format
+    save(string("./res_", res_name, ".jld2"), Dict("distr_α" => distr_α, "distr_fcst" => distr_fcst, "chain_θ_unb" => chain_θ_unb,
                 "chain_θ_bound" => chain_θ_bound, "mwg_const" => mwg_const, "acc_rate" => acc_rate, "par" => par,
                 "nDraws" => nDraws, "burnin" => burnin, "data" => data, "date" => date, "nM" => nM, "nQ" => nQ,
                 "MNEMONIC" => MNEMONIC, "par_ind" => par_ind, "par_size" => par_size, "distr_par" => distr_par, "σʸ" => σʸ));
+end
 
+"""
+    tc_cond_fc_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64}, res_name::String, cond::Vector{Any}, res_name_iis::String)
 
-# ----------------------------------------------------------------------------------------------------------------------
-# Execution: run_type == 2
-# - Conditional forecasts
-# ----------------------------------------------------------------------------------------------------------------------
-
-elseif run_type == 2
+Conditional forecasts.
+"""
+function tc_cond_fc_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64}, res_name::String, cond::Vector{Any}, res_name_iis::String)
 
     # ----- Load in-sample output -----
 
-    # Load jld output
-    res_iis = load(string("./res_", res_name_iis, ".jld"));
+    # Load jld2 output
+    res_iis = load(string("./res_", res_name_iis, ".jld2"));
 
     # Minimum output to compute the conditional forecasts
     data      = res_iis["data"];
@@ -109,18 +130,18 @@ elseif run_type == 2
 
         print("\n");
 
-        # Save res in jld format
-        save(string("./res_", res_name, "_cond$(i).jld"), Dict("data_ith" => data_ith, "distr_fcst_cond" => distr_fcst_cond,
-                                                                "distr_α_cond" => distr_α_cond, "conditional_path" => cond[i]));
+        # Save res in jld2 format
+        save(string("./res_", res_name, "_cond$(i).jld2"), Dict("data_ith" => data_ith, "distr_fcst_cond" => distr_fcst_cond,
+                    "distr_α_cond" => distr_α_cond, "conditional_path" => cond[i]));
     end
+end
 
+"""
+    tc_oos_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64}, res_name::String, end_presample_vec::Vector{Int64})
 
-# ----------------------------------------------------------------------------------------------------------------------
-# Execution: run_type == 3
-# -  Out-of-sample: out-of-sample exercise, forecasting period starts after end_presample_vec
-# ----------------------------------------------------------------------------------------------------------------------
-
-elseif run_type == 3
+Out-of-sample: out-of-sample exercise, forecasting period starts after end_presample_vec.
+"""
+function tc_oos_run(data::Matrix{Union{Float64, Missing}}, date::Vector{Date}, nM::Int64, nQ::Int64, MNEMONIC::Vector{String}, h::Int64, nDraws::Vector{Int64}, burnin::Vector{Int64}, mwg_const::Vector{Float64}, res_name::String, end_presample_vec::Vector{Int64})
 
     # ----- Initialise -----
 
@@ -141,42 +162,50 @@ elseif run_type == 3
 
     for t=end_presample:end_oos
 
-        # data and data_cond
-        data = data_full[1:t, :];
-
-        # Mixed-frequency
-        if nM > 0 && nQ > 0
-            σʸ_monthly   = hcat([std(collect(skipmissing(diff(data[:, i]))), dims=1) for i=1:nM]...);
-            σʸ_quarterly = hcat([std(collect(skipmissing(diff(data[3:3:end, i]))), dims=1) for i=nM+1:nM+nQ]...);
-            σʸ           = [σʸ_monthly σʸ_quarterly];
-
-        # Mono frequency
-        else
-            σʸ = hcat([std(collect(skipmissing(diff(data[:, i]))), dims=1) for i=1:nM+nQ]...);
-        end
-
-        data = data ./ σʸ;
-        data = [data; missing .* ones(h, nM+nQ)];
-
+        # Prepare the data
+        data_t = data_full[1:t, :];
+        σʸ = standardise_data!(data_t, nM, nQ);
+        data_t = [data_t; missing.*ones(h, nM+nQ)]; # add "missings" for forecast
+    
         # Run the Metropolis-Within-Gibbs
         global mwg_const;
         distr_α, distr_fcst, chain_θ_unb, chain_θ_bound, mwg_const, acc_rate, par, par_ind, par_size, distr_par =
-             tc_mwg(data, h, nDraws, burnin, mwg_const, σʸ);
+             tc_mwg(data_t, h, nDraws, burnin, mwg_const, σʸ);
 
         # Re-attribute standard deviation of the delta to the forecasts
         for draw=1:nDraws[2]-burnin[2]
             distr_fcst[:, :, draw] = distr_fcst[:, :, draw] .* σʸ;
         end
 
-        # Save res for time t in jld format
-        save(string("./res_", res_name, "_chunk", t-end_presample+1, ".jld"), Dict("distr_α" => distr_α, "distr_fcst" => distr_fcst,
+        # Save res for time t in jld2 format
+        save(string("./res_", res_name, "_chunk", t-end_presample+1, ".jld2"), Dict("distr_α" => distr_α, "distr_fcst" => distr_fcst,
                     "chain_θ_unb" => chain_θ_unb, "chain_θ_bound" => chain_θ_bound, "mwg_const" => mwg_const,
                     "acc_rate" => acc_rate, "par" => par, "par_ind" => par_ind, "par_size" => par_size,
-                    "distr_par" => distr_par, "data" => data, "σʸ" => σʸ));
+                    "distr_par" => distr_par, "data" => data_t, "σʸ" => σʸ));
     end
 
-    # Save res in jld format
-    save(string("./res_", res_name, "_chunk0.jld"), Dict("end_presample" => end_presample, "end_oos" => end_oos,
+    # Save res in jld2 format
+    save(string("./res_", res_name, "_chunk0.jld2"), Dict("end_presample" => end_presample, "end_oos" => end_oos,
                 "oos_length" => oos_length, "nDraws" => nDraws, "burnin" => burnin, "date" => date,
                 "nM" => nM, "nQ" => nQ, "MNEMONIC" => MNEMONIC, "data_full" => data_full));
+end
+
+
+#=
+--------------------------------------------------------------------------------------------------
+Execution manager
+--------------------------------------------------------------------------------------------------
+=#
+
+# Single iteration: it executes the code using the most updated datapoints
+if run_type == 1
+    tc_iis_run(data, date, nM, nQ, MNEMONIC, h, nDraws, burnin, mwg_const, res_name);
+
+# Conditional forecasts
+elseif run_type == 2
+    tc_cond_fc_run(data, date, nM, nQ, MNEMONIC, h, nDraws, burnin, mwg_const, res_name, cond, res_name_iis);
+
+# Out-of-sample: out-of-sample exercise, forecasting period starts after end_presample_vec
+elseif run_type == 3
+    tc_oos_run(data, date, nM, nQ, MNEMONIC, h, nDraws, burnin, mwg_const, res_name, end_presample_vec);
 end
