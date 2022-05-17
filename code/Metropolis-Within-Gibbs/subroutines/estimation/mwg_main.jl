@@ -93,8 +93,8 @@ function mwg_main(par::ParSsm, h::Int64, nDraws::Array{Int64, 1}, burnin::Array{
      # Transformations: 1 natural logarithm, 2 no transformations, 3 generalized logit
      opt_transf = convert(Array{Int64, 1}, [1*ones(par_size.R);
                                             2*ones(par_size.d + par_size.Z);
-                                            3*ones(par_size.Z_plus);
-                                            3*ones(par_size.Z_minus);
+                                            1*ones(par_size.Z_plus);
+                                            0*ones(par_size.Z_minus);
                                             1*ones(par_size.Q);
                                             2*ones(par_size.c + par_size.T);
                                             3*ones(par_size.λ);
