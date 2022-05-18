@@ -72,8 +72,8 @@ module MetropolisWithinGibbs
 
 	struct PriorOpt{X <: Float64} # the logpdf for λ and ρ are constants
 		N::Distributions.Normal{X}
-		N_plus::Distributions.TruncatedNormal{X}
-		N_minus::Distributions.TruncatedNormal{X}
+		N_plus::Distributions.Truncated{Normal{X}, Continuous, X}
+		N_minus::Distributions.Truncated{Normal{X}, Continuous, X}
 		IG::Distributions.InverseGamma{X}
 		λ::X
 		ρ::X

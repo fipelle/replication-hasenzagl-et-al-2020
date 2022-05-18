@@ -11,6 +11,17 @@ function mwg_main(par::ParSsm, h::Int64, nDraws::Array{Int64, 1}, burnin::Array{
 # ----------------------------------------------------------------------------------------------------------------------
 
      # -----------------------------------------------------------------------------------------------------------------
+     # Error management
+     # -----------------------------------------------------------------------------------------------------------------
+
+     for j in axes(par_ind.Z, 2), i in axes(par_ind.Z, 1)
+          if (par_ind.Z[i,j] == true) && ((par_ind.Z[i,j] == par_ind.Z_plus[i,j]) || (par_ind.Z[i,j] == par_ind.Z_minus[i,j]))
+               error("Check user settings for par_ind.Z_plus and Z_minus!");
+          end
+     end
+
+     
+     # -----------------------------------------------------------------------------------------------------------------
      # Initialise
      # -----------------------------------------------------------------------------------------------------------------
 
@@ -84,7 +95,7 @@ function mwg_main(par::ParSsm, h::Int64, nDraws::Array{Int64, 1}, burnin::Array{
 
      # Define prior distribution objects
      prior_opt = PriorOpt(Normal(0, 1/xi),
-                          TruncatedNormal(0, 1/xi, MIN_coeff_plus, MAX_coeff_plus)
+                          TruncatedNormal(0, 1/xi, MIN_coeff_plus, MAX_coeff_plus),
                           TruncatedNormal(0, 1/xi, MIN_coeff_minus, MAX_coeff_minus),
                           InverseGamma(3, 1),
                           par_size.λ*logpdf.(Uniform(MIN_λ, MAX_λ), MIN_λ),
