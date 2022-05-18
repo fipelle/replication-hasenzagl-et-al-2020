@@ -42,15 +42,15 @@ function set_par!(θ_bound, θ_unb, par, opt_transf, MIN, MAX, par_ind, par_size
                iend                      = iend+par_size.Z;
           end
 
-          if par_size.Z_plus > 0
-               par.Z_plus[par_ind.Z_plus .== true] = θ_bound[iend+1:iend+par_size.Z_plus];
-               par.logprior                        = par.logprior + sum(logpdf.(prior_opt.N_plus, par.Z_plus[par_ind.Z_plus .== true]));
+          if par_size.Z_plus > 0 # par.Z below is correct
+               par.Z[par_ind.Z_plus .== true] = θ_bound[iend+1:iend+par_size.Z_plus];
+               par.logprior                        = par.logprior + sum(logpdf.(prior_opt.N_plus, par.Z[par_ind.Z_plus .== true]));
                iend                                = iend+par_size.Z_plus;
            end
 
-          if par_size.Z_minus > 0
-              par.Z_minus[par_ind.Z_minus .== true] = θ_bound[iend+1:iend+par_size.Z_minus];
-              par.logprior                          = par.logprior + sum(logpdf.(prior_opt.N_minus, par.Z_minus[par_ind.Z_minus .== true]));
+          if par_size.Z_minus > 0 # par.Z below is correct
+              par.Z[par_ind.Z_minus .== true] = θ_bound[iend+1:iend+par_size.Z_minus];
+              par.logprior                          = par.logprior + sum(logpdf.(prior_opt.N_minus, par.Z[par_ind.Z_minus .== true]));
               iend                                  = iend+par_size.Z_minus;
           end
           

@@ -25,12 +25,10 @@ module MetropolisWithinGibbs
 	# Types
 	# -----------------------------------------------------------------------------------------------------------------
 
-	mutable struct ParSsm{X <: Float64}
+	mutable struct ParSsm{X <: Float64} # Z_plus and Z_minus should not be included here
 		y::Array{Union{X, Missing}, 2}
 		d::Union{Array{X, 1}}
 		Z::Union{Array{X, 1}, Array{X, 2}}
-		Z_plus::Union{Array{X, 1}, Array{X, 2}}
-		Z_minus::Union{Array{X, 1}, Array{X, 2}}
 		R::Union{Array{X, 1}, Array{X, 2}}
 		c::Union{Array{X, 1}}
 		T::Union{Array{X, 1}, Array{X, 2}}
@@ -83,13 +81,6 @@ module MetropolisWithinGibbs
 
 	import Base.copy
 	Base.copy(x::T) where T = T([getfield(x, k) for k ∈ fieldnames(T)]...)
-
-	#=
-	Base.copy(m::ParSsm) 	= ParSsm([ copy(getfield(m, k)) for k = 1:length(fieldnames(m)) ]...);
-	Base.copy(m::SizeParSsm) = SizeParSsm([ copy(getfield(m, k)) for k = 1:length(fieldnames(m)) ]...);
-	Base.copy(m::BoolParSsm) = BoolParSsm([ copy(getfield(m, k)) for k = 1:length(fieldnames(m)) ]...);
-	Base.copy(m::PriorOpt) 	= PriorOpt([ copy(getfield(m, k)) for k = 1:length(fieldnames(m)) ]...);
-	=#
 
 	# -----------------------------------------------------------------------------------------------------------------
 	# Subroutines
