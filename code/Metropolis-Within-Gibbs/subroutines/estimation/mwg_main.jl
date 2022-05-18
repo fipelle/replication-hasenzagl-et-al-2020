@@ -108,7 +108,8 @@ function mwg_main(par::ParSsm, h::Int64, nDraws::Array{Int64, 1}, burnin::Array{
      # Initial guess for θ_ini_bound
      θ_ini_bound = [ones(par_size.R);
                     zeros(par_size.d);
-                    ones(par_size.Z + par_size.Z_plus + par_size.Z_minus);
+                    ones(par_size.Z + par_size.Z_plus);
+                    -ones(par_size.Z_minus);
                     ones(par_size.Q);
                     zeros(par_size.c);
                     ones(par_size.T);
@@ -117,7 +118,6 @@ function mwg_main(par::ParSsm, h::Int64, nDraws::Array{Int64, 1}, burnin::Array{
 
      # Run init
      θ_ini_unb = get_par_unb(θ_ini_bound, MIN, MAX, opt_transf);
-
 
      algorithm_name = "Initialisation";
      acc_rate       = 0.0;
