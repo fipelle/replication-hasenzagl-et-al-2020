@@ -16,7 +16,9 @@ function mwg_main(par::ParSsm, h::Int64, nDraws::Array{Int64, 1}, burnin::Array{
 
      for j in axes(par_ind.Z, 2), i in axes(par_ind.Z, 1)
           if (par_ind.Z[i,j] == true) && ((par_ind.Z[i,j] == par_ind.Z_plus[i,j]) || (par_ind.Z[i,j] == par_ind.Z_minus[i,j]))
-               error("Check user settings for par_ind.Z_plus and Z_minus!");
+               error("Each measurement equation coefficient can be either unrestricted or with a specific sign restriction - not both!");
+          elseif (par_ind.Z_plus[i,j] == true) && (par_ind.Z_plus[i,j] == par_ind.Z_minus[i,j])
+               error("Each measurement equation coefficient can be either restricted to be positive or negative - not both!");
           end
      end
 
