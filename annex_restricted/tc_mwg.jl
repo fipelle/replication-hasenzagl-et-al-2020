@@ -17,7 +17,7 @@ function tc_mwg(y, h, nDraws, burnin, mwg_const, σʸ)
      # -----------------------------------------------------------------------------------------------------------------
 
      d   = zeros(n);
-     Z   = [ones(n) [0; ones(n-1)] [zeros(n-2); ones(2)] [zeros(3); ones(n-3)] [zeros(4); ones(n-4)] [zeros(4); 1 ./ σʸ[end-3:end]]];
+     Z   = [ones(n) [0; ones(n-1)] [zeros(n-2); ones(2)] ones(n) [0; ones(n-1)] [zeros(n-2); ones(2)] [zeros(3); ones(n-3)] [zeros(4); ones(n-4)] [zeros(4); 1 ./ σʸ[end-3:end]]];
      Z1a = kron(Matrix(I, 4, 4), [1, 0, 1])';                                                                                     # idio C, idio C+, idio trend
      Z1b = kron(Matrix(I, 2, 2), [1, 0, 1])';                                                                                     # idio C, idio C+, idio trend
      Z2  = kron(Matrix(I, 2, 2), [1, 0])';                                                                                                    # idio C, idio C+
@@ -28,16 +28,19 @@ function tc_mwg(y, h, nDraws, burnin, mwg_const, σʸ)
      # Indeces for observation equations
      d_ind = d .!= 0;
      Z_ind = zeros(size(Z)) .!= 0;
-     R_ind = R .!= 0;
-
-     # Projections
-     Z_ind[2:end, [1,2]] .= true; # All        -> PC cycle, t and t-1
-     Z_ind[7:end, 3]     .= true; # Expect.    -> PC cycle, t-2
-     Z_ind[5:end, [4,5]] .= true; # Prices     -> EP cycle, t and t-1
-
-     # Z_plus_ind and Z_minus_ind (not used here)
      Z_plus_ind = zeros(size(Z)) .!= 0;
      Z_minus_ind = zeros(size(Z)) .!= 0;
+     R_ind = R .!= 0;
+
+     # Projections (unrestricted)
+     Z_ind[2:3, [1,2,4,5]] .= true; # Labour market indicators       -> BC+ and BC- cycles, t and t-1
+     Z_ind[4:end, [2,5]]   .= true; # Prices and survey expectations -> BC+ and BC- cycles, t and t-1
+     Z_ind[7:end, [3,6]]   .= true; # Survey expectations            -> BC+ and BC- cycles, t-2
+     Z_ind[5:end, [7,8]]   .= true; # Prices                         -> EP cycle, t and t-1
+
+     # Projections (restricted)
+     Z_plus_ind[4:end, 1]  .= true; # Prices and survey expectations -> BC+ t
+     Z_minus_ind[4:end, 4] .= true; # Prices and survey expectations -> BC- t
 
 
      # -----------------------------------------------------------------------------------------------------------------
@@ -45,7 +48,7 @@ function tc_mwg(y, h, nDraws, burnin, mwg_const, σʸ)
      # -----------------------------------------------------------------------------------------------------------------
 
      c              = zeros(size(Z)[2]);
-     ind_trends     = [9; 12]; # GDP, EMPL
+     ind_trends     = [12; 15]; # GDP, EMPL
      c[ind_trends] .= 1;  # random walk drift
 
      T_c     = convert(Array{Float64, 2}, [1 0; 0 0]);
@@ -53,8 +56,8 @@ function tc_mwg(y, h, nDraws, burnin, mwg_const, σʸ)
      T_c_ext = convert(Array{Float64, 2}, [1 0 0; 0 0 0; 0 1 0]);
      Q_c_ext = convert(Array{Float64, 2}, [1 0 0; 0 0 0; 0 0 0]);
 
-     T = cat(dims=[1,2], T_c_ext, [T_ct for i=1:5]..., [T_c for i=1:2]..., [T_ct for i=1:2]...);
-     Q = cat(dims=[1,2], Q_c_ext, [T_ct for i=1:5]..., [T_c for i=1:2]..., [T_ct for i=1:2]...);
+     T = cat(dims=[1,2], [T_c_ext for i=1:2]..., [T_ct for i=1:5]..., [T_c for i=1:2]..., [T_ct for i=1:2]...);
+     Q = cat(dims=[1,2], [Q_c_ext for i=1:2]..., [T_ct for i=1:5]..., [T_c for i=1:2]..., [T_ct for i=1:2]...);
 
      # Indeces for transition equations
      c_ind = c .!= 0;
@@ -64,7 +67,7 @@ function tc_mwg(y, h, nDraws, burnin, mwg_const, σʸ)
      # Initial conditions for the non-stationary states
      P̄_c   = convert(Array{Float64, 2}, [0 0; 0 0]);
      P̄_ct  = convert(Array{Float64, 2}, [0 0 0; 0 0 0; 0 0 1]);
-     P̄¹    = cat(dims=[1,2], zeros(3,3), [P̄_ct for i=1:5]..., [P̄_c for i=1:2]..., [P̄_ct for i=1:2]...);
+     P̄¹    = cat(dims=[1,2], zeros(6,6), [P̄_ct for i=1:5]..., [P̄_c for i=1:2]..., [P̄_ct for i=1:2]...);
 
      # Initial conditions
      α¹ = zeros(size(c));
@@ -73,7 +76,7 @@ function tc_mwg(y, h, nDraws, burnin, mwg_const, σʸ)
      # Trigonometric states
      λ_c   = convert(Array{Float64, 1}, [1; 0]);
      λ_ct  = convert(Array{Float64, 1}, [1; 0; 0]);
-     λ     = vcat([1; 0; 0], [λ_ct for i=1:5]..., [λ_c for i=1:2]..., [λ_ct for i=1:2]...);
+     λ     = vcat([1; 0; 0], [1; 0; 0], [λ_ct for i=1:5]..., [λ_c for i=1:2]..., [λ_ct for i=1:2]...);
      ρ     = copy(λ);
      λ_ind = λ .!= 0;
      ρ_ind = copy(λ_ind);
