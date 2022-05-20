@@ -25,7 +25,7 @@ module MetropolisWithinGibbs
 	# Types
 	# -----------------------------------------------------------------------------------------------------------------
 
-	mutable struct ParSsm{X <: Float64}
+	mutable struct ParSsm{X <: Float64} # Z_plus and Z_minus should not be included here
 		y::Array{Union{X, Missing}, 2}
 		d::Union{Array{X, 1}}
 		Z::Union{Array{X, 1}, Array{X, 2}}
@@ -46,6 +46,8 @@ module MetropolisWithinGibbs
 	struct SizeParSsm{X <: Int64}
 		d::X
 		Z::X
+		Z_plus::X
+		Z_minus::X
 		R::X
 		c::X
 		T::X
@@ -58,6 +60,8 @@ module MetropolisWithinGibbs
 	struct BoolParSsm{X1 <: BitArray{1}, X2 <: BitArray{2}}
 		d::X1
 		Z::X2
+		Z_plus::X2
+		Z_minus::X2
 		R::X2
 		c::X1
 		T::X2
@@ -68,20 +72,15 @@ module MetropolisWithinGibbs
 
 	struct PriorOpt{X <: Float64} # the logpdf for λ and ρ are constants
 		N::Distributions.Normal{X}
-		IG::Distributions.InverseGamma{X} #TruncatedNormal{X}
+		N_plus::Distributions.Truncated{Normal{X}, Continuous, X}
+		N_minus::Distributions.Truncated{Normal{X}, Continuous, X}
+		IG::Distributions.InverseGamma{X}
 		λ::X
 		ρ::X
 	end
 
 	import Base.copy
 	Base.copy(x::T) where T = T([getfield(x, k) for k ∈ fieldnames(T)]...)
-
-	#=
-	Base.copy(m::ParSsm) 	= ParSsm([ copy(getfield(m, k)) for k = 1:length(fieldnames(m)) ]...);
-	Base.copy(m::SizeParSsm) = SizeParSsm([ copy(getfield(m, k)) for k = 1:length(fieldnames(m)) ]...);
-	Base.copy(m::BoolParSsm) = BoolParSsm([ copy(getfield(m, k)) for k = 1:length(fieldnames(m)) ]...);
-	Base.copy(m::PriorOpt) 	= PriorOpt([ copy(getfield(m, k)) for k = 1:length(fieldnames(m)) ]...);
-	=#
 
 	# -----------------------------------------------------------------------------------------------------------------
 	# Subroutines
