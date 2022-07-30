@@ -15,10 +15,8 @@ function mwg_main(par::ParSsm, h::Int64, nDraws::Array{Int64, 1}, burnin::Array{
      # -----------------------------------------------------------------------------------------------------------------
 
      for j in axes(par_ind.Z, 2), i in axes(par_ind.Z, 1)
-          if (par_ind.Z[i,j] == true) && ((par_ind.Z[i,j] == par_ind.Z_plus[i,j]) || (par_ind.Z[i,j] == par_ind.Z_minus[i,j]))
-               error("Each measurement equation coefficient can be either unrestricted or with a specific sign restriction - not both!");
-          elseif (par_ind.Z_plus[i,j] == true) && (par_ind.Z_plus[i,j] == par_ind.Z_minus[i,j])
-               error("Each measurement equation coefficient can be either restricted to be positive or negative - not both!");
+          if (par_ind.Z[i,j] + par_ind.Z_plus[i,j] + par_ind.Z_minus[i,j] + par_ind.Z_bounded[i,j]) > 1
+               error("Each measurement equation coefficient can be either unrestricted or constrained - not both!");
           end
      end
 
@@ -39,6 +37,7 @@ function mwg_main(par::ParSsm, h::Int64, nDraws::Array{Int64, 1}, burnin::Array{
                                  sum(sum(par_ind.Z)),
                                  sum(sum(par_ind.Z_plus)),
                                  sum(sum(par_ind.Z_minus)),
+                                 sum(sum(par_ind.Z_bounded)),
                                  sum(sum(par_ind.R)),
                                  sum(par_ind.c),
                                  sum(sum(par_ind.T)),
@@ -46,7 +45,7 @@ function mwg_main(par::ParSsm, h::Int64, nDraws::Array{Int64, 1}, burnin::Array{
                                  sum(sum(par_ind.λ)),
                                  sum(sum(par_ind.ρ)),
                                  sum(par_ind.d) + sum(sum(par_ind.Z)) + sum(sum(par_ind.Z_plus)) +
-                                    sum(sum(par_ind.Z_minus)) + sum(sum(par_ind.R)) +
+                                    sum(sum(par_ind.Z_minus)) + sum(sum(par_ind.Z_bounded)) + sum(sum(par_ind.R)) +
                                     sum(par_ind.c) + sum(sum(par_ind.T)) + sum(sum(par_ind.Q)) +
                                     sum(sum(par_ind.λ)) + sum(sum(par_ind.ρ)));
 
@@ -56,25 +55,28 @@ function mwg_main(par::ParSsm, h::Int64, nDraws::Array{Int64, 1}, burnin::Array{
      # -----------------------------------------------------------------------------------------------------------------
 
      # Numerical constants
-     xi              = 1e-3; # it must be small
-     MIN_var         = 0;
-     MIN_coeff       = -Inf;
-     MIN_coeff_plus  = 0;
-     MIN_coeff_minus = -Inf;
-     MIN_λ           = xi;
-     MIN_ρ           = xi;
-     MAX_var         = Inf;
-     MAX_coeff       = Inf;
-     MAX_coeff_plus  = Inf;
-     MAX_coeff_minus = 0;
-     MAX_λ           = pi;
-     MAX_ρ           = 0.97;
+     xi                = 1e-3; # it must be small
+     MIN_var           = 0;
+     MIN_coeff         = -Inf;
+     MIN_coeff_plus    = 0;
+     MIN_coeff_minus   = -Inf;
+     MIN_coeff_bounded = -1;
+     MIN_λ             = xi;
+     MIN_ρ             = xi;
+     MAX_var           = Inf;
+     MAX_coeff         = Inf;
+     MAX_coeff_plus    = Inf;
+     MAX_coeff_minus   = 0;
+     MAX_coeff_bounded = 1;
+     MAX_λ             = pi;
+     MAX_ρ             = 0.97;
 
      # MIN
      MIN = [MIN_var*ones(par_size.R);
             MIN_coeff*ones(par_size.d + par_size.Z);
             MIN_coeff_plus*ones(par_size.Z_plus);
             MIN_coeff_minus*ones(par_size.Z_minus);
+            MIN_coeff_bounded*ones(par_size.Z_bounded);
             MIN_var*ones(par_size.Q);
             MIN_coeff*ones(par_size.c + par_size.T);
             MIN_λ*ones(par_size.λ);
@@ -85,6 +87,7 @@ function mwg_main(par::ParSsm, h::Int64, nDraws::Array{Int64, 1}, burnin::Array{
             MAX_coeff*ones(par_size.d + par_size.Z);
             MAX_coeff_plus*ones(par_size.Z_plus);
             MAX_coeff_minus*ones(par_size.Z_minus);
+            MAX_coeff_bounded*ones(par_size.Z_bounded);
             MAX_var*ones(par_size.Q);
             MAX_coeff*ones(par_size.c + par_size.T);
             MAX_λ*ones(par_size.λ);
@@ -99,6 +102,7 @@ function mwg_main(par::ParSsm, h::Int64, nDraws::Array{Int64, 1}, burnin::Array{
      prior_opt = PriorOpt(Normal(0, 1/xi),
                           TruncatedNormal(0, 1/xi, MIN_coeff_plus, MAX_coeff_plus),
                           TruncatedNormal(0, 1/xi, MIN_coeff_minus, MAX_coeff_minus),
+                          TruncatedNormal(0, 1/xi, MIN_coeff_bounded, MAX_coeff_bounded),
                           InverseGamma(3, 1),
                           par_size.λ*logpdf.(Uniform(MIN_λ, MAX_λ), MIN_λ),
                           par_size.ρ*logpdf.(Uniform(MIN_ρ, MAX_ρ), MIN_ρ));
@@ -108,6 +112,7 @@ function mwg_main(par::ParSsm, h::Int64, nDraws::Array{Int64, 1}, burnin::Array{
                                             2*ones(par_size.d + par_size.Z);
                                             1*ones(par_size.Z_plus);
                                             0*ones(par_size.Z_minus);
+                                            3*ones(par_size.Z_bounded);
                                             1*ones(par_size.Q);
                                             2*ones(par_size.c + par_size.T);
                                             3*ones(par_size.λ);
@@ -123,6 +128,7 @@ function mwg_main(par::ParSsm, h::Int64, nDraws::Array{Int64, 1}, burnin::Array{
                     zeros(par_size.d);
                     ones(par_size.Z + par_size.Z_plus);
                     -ones(par_size.Z_minus);
+                    (MAX_coeff_bounded-MIN_coeff_bounded)*ones(par_size.Z_bounded);
                     ones(par_size.Q);
                     zeros(par_size.c);
                     ones(par_size.T);
