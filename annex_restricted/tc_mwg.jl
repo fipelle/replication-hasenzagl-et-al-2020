@@ -30,6 +30,7 @@ function tc_mwg(y, h, nDraws, burnin, mwg_const, σʸ)
      Z_ind = zeros(size(Z)) .!= 0;
      Z_plus_ind = zeros(size(Z)) .!= 0;
      Z_minus_ind = zeros(size(Z)) .!= 0;
+     Z_bounded_ind = zeros(size(Z)) .!= 0; # not used here
      R_ind = R .!= 0;
 
      # Projections (unrestricted)
@@ -86,7 +87,7 @@ function tc_mwg(y, h, nDraws, burnin, mwg_const, σʸ)
      # Metropolis-Within-Gibbs
      # -----------------------------------------------------------------------------------------------------------------
 
-     par_ind = BoolParSsm(d_ind, Z_ind, Z_plus_ind, Z_minus_ind, R_ind, c_ind, T_ind, Q_ind, λ_ind, ρ_ind);
+     par_ind = BoolParSsm(d_ind, Z_ind, Z_plus_ind, Z_minus_ind, Z_bounded_ind, R_ind, c_ind, T_ind, Q_ind, λ_ind, ρ_ind);
      par     = ParSsm(permutedims(y), d, Z, R, c, T, Q, α¹, P¹, P̄¹, λ, ρ, 0.0, 0.0, 0.0);
 
      distr_α, distr_fcst, chain_θ_unb, chain_θ_bound, mwg_const, acc_rate, par, par_size, distr_par =
