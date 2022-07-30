@@ -25,7 +25,7 @@ module MetropolisWithinGibbs
 	# Types
 	# -----------------------------------------------------------------------------------------------------------------
 
-	mutable struct ParSsm{X <: Float64} # Z_plus and Z_minus should not be included here
+	mutable struct ParSsm{X <: Float64} # Z_plus, Z_minus and Z_bounded should not be included here
 		y::Array{Union{X, Missing}, 2}
 		d::Union{Array{X, 1}}
 		Z::Union{Array{X, 1}, Array{X, 2}}
@@ -48,6 +48,7 @@ module MetropolisWithinGibbs
 		Z::X
 		Z_plus::X
 		Z_minus::X
+		Z_bounded::X
 		R::X
 		c::X
 		T::X
@@ -62,6 +63,7 @@ module MetropolisWithinGibbs
 		Z::X2
 		Z_plus::X2
 		Z_minus::X2
+		Z_bounded::X
 		R::X2
 		c::X1
 		T::X2
@@ -74,6 +76,7 @@ module MetropolisWithinGibbs
 		N::Distributions.Normal{X}
 		N_plus::Distributions.Truncated{Normal{X}, Continuous, X}
 		N_minus::Distributions.Truncated{Normal{X}, Continuous, X}
+		N_bounded::Distributions.Truncated{Normal{X}, Continuous, X}
 		IG::Distributions.InverseGamma{X}
 		λ::X
 		ρ::X
